@@ -1,4 +1,5 @@
-// This page is for handling hydration issues with Next.js
+// This page is a wrapper component for handling hydration issues with Next.js
+// It will render its children when the component is mounted on the frontend
 
 "use client";
 import React, { useState, useEffect } from "react";

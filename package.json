@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@types/debounce": "^1.2.4",
     "appwrite": "^16.1.0",
     "autoprefixer": "^10.4.20",
