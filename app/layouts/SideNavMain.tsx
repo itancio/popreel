@@ -6,6 +6,7 @@ import MenuItemFollow from "./MenuItemFollow";
 
 export default function SideNavMain() {
   const pathname = usePathname();
+
   return (
     <>
       <div
@@ -20,7 +21,7 @@ export default function SideNavMain() {
           <Link href="/">
             <MenuItem
               iconString="For You"
-              colorString={pathname == "/" ? "#F02C56" : ""}
+              colorString={pathname == "/" ? "#EC8523" : ""}
               sizeString="25"
             />
           </Link>
@@ -41,29 +42,66 @@ export default function SideNavMain() {
           <ClientOnly>
             <>
               <div className="cursor-pointer">
-                <MenuItemFollow user="https://placeholder.co/400" />
+                <MenuItemFollow
+                  user={{
+                    id: "1",
+                    name: "Test user",
+                    image: "https://placehold.co/400",
+                  }}
+                />
               </div>
             </>
           </ClientOnly>
 
-          <button className="lg:block hidden text-[#F02C56] pt-1.5 pl-2 text-[13px]">
+          <button className="lg:block hidden text-[#EC8523] pt-1.5 pl-2 text-[13px]">
             See all
           </button>
 
           {/* Following accounts */}
+          {true ? (
+            <div>
+              <div className="border-b lg:ml-2 mt-2" />
+              <h3 className="lg:block hidden text-xs text-gray-600 font-semibold pt-4 pb-2 px-2">
+                Following accounts
+              </h3>
+
+              <div className="lg:hidden block pt-3" />
+              <ClientOnly>
+                <div className="cursor-pointer">
+                  {
+                    <div className="cursor-pointer">
+                      <MenuItemFollow
+                        user={{
+                          id: "1",
+                          name: "Test user",
+                          image: "https://placehold.co/400",
+                        }}
+                      />
+                    </div>
+                  }
+                </div>
+              </ClientOnly>
+
+              <button className="lg:block hidden text-[#EC8523] pt-1.5 pl-2 text-[13px]">
+                See more
+              </button>
+            </div>
+          ) : null}
+
+          {/* Side footer Area */}
           <div className="lg:block hidden border-b lg:ml-2 mt-2" />
           <div className="lg:block hidden text-[11px] text-gray-500">
             <p className="pt-4 px-2">
-              About Newsroom TikTok Shop Contact Careers ByteDance
+              About Newsroom Popreel Shop Contact Careers ByteDance
             </p>
             <p className="pt-4 px-2">
-              TikTok for Good Advertise Developers Transparency TikTok Rewards
-              TikTok Browse TikTok Embeds
+              Popreel for Good Advertise Developers Transparency Popreel Rewards
+              Popreel Browse Popreel Embeds
             </p>
             <p className="pt-4 px-2">
               Help Safety Terms Privacy Creator Portal Community Guidelines
             </p>
-            <p className="pt-4 px-2">© 2023 TikTok</p>
+            <p className="pt-4 px-2">© 2023 Popreel</p>
           </div>
 
           <div className="pb-14"></div>

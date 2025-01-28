@@ -55,7 +55,7 @@ export default function TopNav() {
               <div className="p-1">
                 <Link
                   href={`/profile/johnreel`}
-                  className="flex items-center justify-between w-full cursor-pointer hover:bg-[#F12B56] p-1 px-2 hover:text-white"
+                  className="flex items-center justify-between w-full cursor-pointer hover:bg-[#EC8523] p-1 px-2 hover:text-white"
                 >
                   <div className="flex items-center">
                     <Image
@@ -91,7 +91,7 @@ export default function TopNav() {
             <div className="flex items-center">
               <button
                 onClick={() => setIsLoginOpen(true)}
-                className="flex items-center bg-[#F02C56] text-white border rounded-md px-3 py-[6px]"
+                className="flex items-center bg-[#EC8523] text-white border rounded-md px-3 py-[6px]"
               >
                 <span className="whitespace-nowrap mx-4 font-medium text-[15px]">
                   Log in
