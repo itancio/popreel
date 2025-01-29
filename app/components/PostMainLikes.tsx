@@ -8,10 +8,10 @@ import { Comment } from "@/app/types";
 
 export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
   const router = useRouter();
-  const [hasClickedLike, setHasClickedLike] = useState<boolean>(false);
-  const [userLiked, setUserLiked] = useState<boolean>(false);
-  const [likes, setLikes] = useState<Like[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [hasClickedLike] = useState<boolean>(false);
+  const [userLiked] = useState<boolean>(false);
+  const [likes] = useState<Like[]>([]);
+  const [comments] = useState<Comment[]>([]);
   const likeOrUnlike = () => {
     console.log("TODO");
   };

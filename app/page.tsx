@@ -2,7 +2,7 @@
 
 import MainLayout from "@/app/layouts/MainLayout";
 import ClientOnly from "@/app/components/ClientOnly";
-import PostMain from "@/app/layouts/PostMain";
+import PostMain from "@/app/components/PostMain";
 
 export default function Home() {
   return (
