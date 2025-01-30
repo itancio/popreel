@@ -1,19 +1,26 @@
-import type { Metadata } from "next";
+import UserProvider from "./context/user";
+import AllOverlays from "@/app/components/AllOverlays";
 import "./globals.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Popreel",
-  description: "Popreel is a social media platform for sharing videos.",
+  title: "TikTok Clone",
+  description: "TikTok Clone",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <UserProvider>
+        <body>
+          <AllOverlays />
+          {children}
+        </body>
+      </UserProvider>
     </html>
   );
 }
