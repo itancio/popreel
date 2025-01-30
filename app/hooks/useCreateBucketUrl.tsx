@@ -1,11 +1,15 @@
+
+
+// This is an endpoint for the AppWrite bucket
 const useCreateBucketUrl = (fileId: string) => {
-  const url = process.env.NEXT_PUBLIC_APPWRITE_URL;
-  const id = process.env.NEXT_PUBLIC_BUCKET_ID;
-  const endpoint = process.env.NEXT_PUBLIC_ENDPOINT;
 
-  if (!url || !id || !endpoint || !fileId) return "";
+    const url = process.env.NEXT_PUBLIC_APPWRITE_URL
+    const id = process.env.NEXT_PUBLIC_BUCKET_ID
+    const endpoint = process.env.NEXT_PUBLIC_ENDPOINT
 
-  return `${url}/storage/buckets/${id}/files/${fileId}/view?project=${endpoint}`;
-};
+    if (!url || !id || !endpoint || !fileId) return ''
 
-export default useCreateBucketUrl;
+    return `${url}/storage/buckets/${id}/files/${fileId}/view?project=${endpoint}`
+}
+
+export default useCreateBucketUrl
