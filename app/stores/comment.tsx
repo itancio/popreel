@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools, createJSONStorage } from "zustand/middleware";
 import { CommentWithProfile } from "../types";
-import useGetCommentsByPostId from "../hooks/getCommentsByPostId";
+import getCommentsByPostId from "../hooks/getCommentsByPostId";
 
 interface CommentStore {
   commentsByPost: CommentWithProfile[];
@@ -15,7 +15,7 @@ export const useCommentStore = create<CommentStore>()(
         commentsByPost: [],
 
         setCommentsByPost: async (postId: string) => {
-          const result = await useGetCommentsByPostId(postId);
+          const result = await getCommentsByPostId(postId);
           set({ commentsByPost: result });
         },
       }),

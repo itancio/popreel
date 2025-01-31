@@ -8,11 +8,16 @@ const getProfileByUserId = async (userId: string) => {
       [Query.equal("user_id", userId)]
     );
     const documents = response.documents;
+    console.log("getProfileByUserId", documents);
+    let image = documents[0]?.image;
+    if (!image) {
+      image = "6799d346002ca7003002";
+    }
     return {
       id: documents[0]?.$id,
       user_id: documents[0]?.user_id,
       name: documents[0]?.name,
-      image: documents[0]?.image,
+      image: image,
       bio: documents[0]?.bio,
     };
   } catch (error) {

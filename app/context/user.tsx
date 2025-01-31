@@ -10,8 +10,8 @@ import React, {
 import { account, ID } from "@/libs/AppWriteClient";
 import { User, UserContextTypes } from "../types";
 import { useRouter } from "next/navigation";
-import useGetProfileByUserId from "../hooks/getProfileByUserId";
-import useCreateProfile from "../hooks/createProfile";
+import getProfileByUserId from "../hooks/getProfileByUserId";
+import createProfile from "../hooks/createProfile";
 
 const UserContext = createContext<UserContextTypes | null>(null);
 
@@ -25,7 +25,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       if (!currentSession) return;
 
       const promise = (await account.get()) as any;
-      const profile = await useGetProfileByUserId(promise?.$id);
+      const profile = await getProfileByUserId(promise?.$id);
 
       setUser({
         id: promise?.$id,
@@ -35,6 +35,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     } catch (error) {
       setUser(null);
+      console.error(error);
     }
   };
 
@@ -47,7 +48,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const promise = await account.create(ID.unique(), email, password, name);
       await account.createEmailPasswordSession(email, password);
 
-      await useCreateProfile(
+      await createProfile(
         promise?.$id,
         name,
         String(process.env.NEXT_PUBLIC_PLACEHOLDER_DEAFULT_IMAGE_ID),

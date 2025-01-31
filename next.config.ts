@@ -24,6 +24,13 @@ const nextConfig: NextConfig = {
         pathname: "/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "cloud.appwrite.io",
+        port: "",
+        pathname: "/v1/storage/buckets/**",
+        search: "",
+      },
     ],
     dangerouslyAllowSVG: true, // Enable SVG in next/image
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;", // Optional, for security
