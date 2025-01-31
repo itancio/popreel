@@ -19,16 +19,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "placehold.co",
+        hostname: "cloud.appwrite.io",
         port: "",
-        pathname: "/**",
-        search: "",
+        pathname: "/v1/storage/buckets/**/files/**/view",
       },
       {
         protocol: "https",
-        hostname: "cloud.appwrite.io",
+        hostname: "placehold.co",
         port: "",
-        pathname: "/v1/storage/buckets/**",
+        pathname: "/**",
         search: "",
       },
     ],

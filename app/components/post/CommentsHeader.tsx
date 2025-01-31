@@ -9,24 +9,25 @@ import { useUser } from "@/app/context/user";
 import { useEffect, useState } from "react";
 import { BiLoaderCircle } from "react-icons/bi";
 import ClientOnly from "../ClientOnly";
-import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
+import createBucketUrl from "@/app/hooks/createBucketUrl";
 import { useLikeStore } from "@/app/stores/like";
 import { useCommentStore } from "@/app/stores/comment";
 import { useGeneralStore } from "@/app/stores/general";
 import { useRouter } from "next/navigation";
-import useIsLiked from "@/app/hooks/isLiked";
-import useCreateLike from "@/app/hooks/createLike";
-import useDeleteLike from "@/app/hooks/deleteLike";
-import useDeletePostById from "@/app/hooks/deletePostById";
+import isLiked from "@/app/hooks/isLiked";
+import createLike from "@/app/hooks/createLike";
+import deleteLike from "@/app/hooks/deleteLike";
+import deletePostById from "@/app/hooks/deletePostById";
 import { CommentsHeaderCompTypes } from "@/app/types";
+import Image from "next/image";
 
 export default function CommentsHeader({
   post,
   params,
 }: CommentsHeaderCompTypes) {
-  let { setLikesByPost, likesByPost } = useLikeStore();
-  let { commentsByPost, setCommentsByPost } = useCommentStore();
-  let { setIsLoginOpen } = useGeneralStore();
+  const { setLikesByPost, likesByPost } = useLikeStore();
+  const { commentsByPost, setCommentsByPost } = useCommentStore();
+  const { setIsLoginOpen } = useGeneralStore();
 
   const contextUser = useUser();
   const router = useRouter();
@@ -47,14 +48,14 @@ export default function CommentsHeader({
       setUserLiked(false);
       return;
     }
-    let res = useIsLiked(contextUser.user.id, params.postId, likesByPost);
+    const res = isLiked(contextUser.user.id, params.postId, likesByPost);
     setUserLiked(res ? true : false);
   };
 
   const like = async () => {
     try {
       setHasClickedLike(true);
-      await useCreateLike(contextUser?.user?.id || "", params.postId);
+      await createLike(contextUser?.user?.id || "", params.postId);
       setLikesByPost(params.postId);
       setHasClickedLike(false);
     } catch (error) {
@@ -67,7 +68,7 @@ export default function CommentsHeader({
   const unlike = async (id: string) => {
     try {
       setHasClickedLike(true);
-      await useDeleteLike(id);
+      await deleteLike(id);
       setLikesByPost(params.postId);
       setHasClickedLike(false);
     } catch (error) {
@@ -80,7 +81,7 @@ export default function CommentsHeader({
   const likeOrUnlike = () => {
     if (!contextUser?.user) return setIsLoginOpen(true);
 
-    let res = useIsLiked(contextUser.user.id, params.postId, likesByPost);
+    const res = isLiked(contextUser.user.id, params.postId, likesByPost);
     if (!res) {
       like();
     } else {
@@ -97,13 +98,13 @@ export default function CommentsHeader({
   };
 
   const deletePost = async () => {
-    let res = confirm("Are you sure you want to delete this post?");
+    const res = confirm("Are you sure you want to delete this post?");
     if (!res) return;
 
     setIsDeleteing(true);
 
     try {
-      await useDeletePostById(params?.postId, post?.video_url);
+      await deletePostById(params?.postId, post?.video_url);
       router.push(`/profile/${params.userId}`);
       setIsDeleteing(false);
     } catch (error) {
@@ -118,10 +119,12 @@ export default function CommentsHeader({
         <div className="flex items-center">
           <Link href={`/profile/${post?.user_id}`}>
             {post?.profile.image ? (
-              <img
+              <Image
+                alt="profile picture"
+                width={40}
+                height={40}
                 className="rounded-full lg:mx-0 mx-auto"
-                width="40"
-                src={useCreateBucketUrl(post?.profile.image)}
+                src={createBucketUrl(post?.profile.image)}
               />
             ) : (
               <div className="w-[40px] h-[40px] bg-gray-200 rounded-full"></div>
