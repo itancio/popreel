@@ -1,17 +1,12 @@
-import { TextInputCompTypes } from "@/app/types";
+import { TextInputCompTypes } from "../types"
 
-export default function TextInput({
-  string,
-  inputType,
-  placeholder,
-  error,
-  onUpdate,
-}: TextInputCompTypes) {
+export default function TextInput({ string, inputType, placeholder, error, onUpdate }: TextInputCompTypes) {
+
   return (
     <>
-      <input
-        placeholder={placeholder}
-        className="
+        <input 
+            placeholder={placeholder}
+            className="
                 block
                 w-full
                 bg-[#F1F1F2]
@@ -22,16 +17,16 @@ export default function TextInput({
                 py-2.5
                 px-3
                 focus:outline-none
-            "
-        value={string || ""}
-        onChange={(event) => onUpdate(event.target.value)}
-        type={inputType}
-        autoComplete="off"
-      />
+            " 
+            value={string || ''}
+            onChange={(event) => onUpdate(event.target.value)}
+            type={inputType}
+            autoComplete="off"
+        />
 
-      <div className="text-red-500 text-[14px] font-semibold">
-        {error ? error : null}
-      </div>
+        <div className="text-red-500 text-[14px] font-semibold">
+            {error ? (error) : null}
+        </div>
     </>
-  );
+  )
 }

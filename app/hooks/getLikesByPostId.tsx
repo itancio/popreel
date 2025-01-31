@@ -1,6 +1,6 @@
 import { database, Query } from "@/libs/AppWriteClient"
 
-const useGetLikesByPostId = async (postId: string) => {
+const getLikesByPostId = async (postId: string) => {
     try {
         const response = await database.listDocuments(
             String(process.env.NEXT_PUBLIC_DATABASE_ID), 
@@ -24,4 +24,4 @@ const useGetLikesByPostId = async (postId: string) => {
     }
 }
 
-export default useGetLikesByPostId
+export default getLikesByPostId

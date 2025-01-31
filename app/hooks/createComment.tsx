@@ -1,6 +1,6 @@
 import { database, ID } from "@/libs/AppWriteClient"
 
-const useCreateComment = async (userId: string, postId: string, comment: string) => {
+const createComment = async (userId: string, postId: string, comment: string) => {
     try {
         await database.createDocument(
             String(process.env.NEXT_PUBLIC_DATABASE_ID), 
@@ -17,4 +17,4 @@ const useCreateComment = async (userId: string, postId: string, comment: string)
     }
 }
 
-export default useCreateComment
+export default createComment

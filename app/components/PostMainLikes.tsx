@@ -1,26 +1,99 @@
-import { Like, PostMainLikesCompTypes } from "@/app/types";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
+import { FaShare, FaCommentDots } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useUser } from "../context/user";
 import { BiLoaderCircle } from "react-icons/bi";
-import { FaCommentDots, FaShare } from "react-icons/fa";
-import { Comment } from "@/app/types";
+import { useGeneralStore } from "../stores/general";
+import { useRouter } from "next/navigation";
+import { Comment, Like, PostMainLikesCompTypes } from "../types";
+import useGetCommentsByPostId from "../hooks/getCommentsByPostId";
+import useGetLikesByPostId from "../hooks/getLikesByPostId";
+import useIsLiked from "../hooks/isLiked";
+import useCreateLike from "../hooks/createLike";
+import useDeleteLike from "../hooks/deleteLike";
 
 export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
+  let { setIsLoginOpen } = useGeneralStore();
+
   const router = useRouter();
-  const [hasClickedLike] = useState<boolean>(false);
-  const [userLiked] = useState<boolean>(false);
-  const [likes] = useState<Like[]>([]);
-  const [comments] = useState<Comment[]>([]);
+  const contextUser = useUser();
+  const [hasClickedLike, setHasClickedLike] = useState<boolean>(false);
+  const [userLiked, setUserLiked] = useState<boolean>(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [likes, setLikes] = useState<Like[]>([]);
+
+  useEffect(() => {
+    getAllLikesByPost();
+    getAllCommentsByPost();
+  }, [post]);
+
+  useEffect(() => {
+    hasUserLikedPost();
+  }, [likes, contextUser]);
+
+  const getAllCommentsByPost = async () => {
+    let result = await useGetCommentsByPostId(post?.id);
+    setComments(result);
+  };
+
+  const getAllLikesByPost = async () => {
+    let result = await useGetLikesByPostId(post?.id);
+    setLikes(result);
+  };
+
+  const hasUserLikedPost = () => {
+    if (!contextUser) return;
+
+    if (likes?.length < 1 || !contextUser?.user?.id) {
+      setUserLiked(false);
+      return;
+    }
+    let res = useIsLiked(contextUser?.user?.id, post?.id, likes);
+    setUserLiked(res ? true : false);
+  };
+
+  const like = async () => {
+    setHasClickedLike(true);
+    await useCreateLike(contextUser?.user?.id || "", post?.id);
+    await getAllLikesByPost();
+    hasUserLikedPost();
+    setHasClickedLike(false);
+  };
+
+  const unlike = async (id: string) => {
+    setHasClickedLike(true);
+    await useDeleteLike(id);
+    await getAllLikesByPost();
+    hasUserLikedPost();
+    setHasClickedLike(false);
+  };
+
   const likeOrUnlike = () => {
-    console.log("TODO");
+    if (!contextUser?.user?.id) {
+      setIsLoginOpen(true);
+      return;
+    }
+
+    let res = useIsLiked(contextUser?.user?.id, post?.id, likes);
+
+    if (!res) {
+      like();
+    } else {
+      likes.forEach((like: Like) => {
+        if (
+          contextUser?.user?.id == like?.user_id &&
+          like?.post_id == post?.id
+        ) {
+          unlike(like?.id);
+        }
+      });
+    }
   };
 
   return (
     <>
       <div id={`PostMainLikes-${post?.id}`} className="relative mr-[75px]">
         <div className="absolute bottom-0 pl-2">
-          {/* Like Button */}
           <div className="pb-4 text-center">
             <button
               disabled={hasClickedLike}
@@ -41,7 +114,6 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
             </span>
           </div>
 
-          {/* Comment Button */}
           <button
             onClick={() =>
               router.push(`/post/${post?.id}/${post?.profile?.user_id}`)
@@ -56,7 +128,6 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
             </span>
           </button>
 
-          {/* Share Button */}
           <button className="text-center">
             <div className="rounded-full bg-gray-200 p-2 cursor-pointer">
               <FaShare size="25" />

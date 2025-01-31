@@ -1,33 +1,41 @@
-import TextInput from "@/app/components/TextInput";
-import { CropperDimensions, ShowErrorObject } from "@/app/types";
-import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cropper } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
-import { AiOutlineClose } from "react-icons/ai";
-import { BiLoaderCircle } from "react-icons/bi";
+import TextInput from "../TextInput";
 import { BsPencil } from "react-icons/bs";
+import { AiOutlineClose } from "react-icons/ai";
+import { useUser } from "@/app/context/user";
+import { useRouter } from "next/navigation";
+import { BiLoaderCircle } from "react-icons/bi";
+import { CropperDimensions, ShowErrorObject } from "@/app/types";
+import { useProfileStore } from "@/app/stores/profile";
+import { useGeneralStore } from "@/app/stores/general";
+import useUpdateProfile from "@/app/hooks/updateProfile";
+import useChangeUserImage from "@/app/hooks/changeUserImage";
+import useUpdateProfileImage from "@/app/hooks/updateProfileImage";
+import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
 
 export default function EditProfileOverlay() {
-  const [isUpdating] = useState(false);
+  let { currentProfile, setCurrentProfile } = useProfileStore();
+  let { setIsEditProfileOpen } = useGeneralStore();
+
+  const contextUser = useUser();
+  const router = useRouter();
+
   const [file, setFile] = useState<File | null>(null);
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [cropper, setCropper] = useState<CropperDimensions | null>(null);
-  const [userBio, setUserBio] = useState<string | "">("");
-  const [userImage, setUserImage] = useState<string | "">(
-    "https://placehold.co/100"
-  );
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [userImage, setUserImage] = useState<string | "">("");
   const [userName, setUserName] = useState<string | "">("");
+  const [userBio, setUserBio] = useState<string | "">("");
+  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<ShowErrorObject | null>(null);
 
-  const updateUserInfo = async () => {
-    console.log("Updating user info");
-  };
-
-  const cropAndUpdateImage = async () => {
-    console.log("Cropping and updating image");
-  };
+  useEffect(() => {
+    setUserName(currentProfile?.name || "");
+    setUserBio(currentProfile?.bio || "");
+    setUserImage(currentProfile?.image || "");
+  }, []);
 
   const getUploadedImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files && event.target.files[0];
@@ -41,11 +49,62 @@ export default function EditProfileOverlay() {
     }
   };
 
+  const updateUserInfo = async () => {
+    let isError = validate();
+    if (isError) return;
+    if (!contextUser?.user) return;
+
+    try {
+      setIsUpdating(true);
+      await useUpdateProfile(currentProfile?.id || "", userName, userBio);
+      setCurrentProfile(contextUser?.user?.id);
+      setIsEditProfileOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const cropAndUpdateImage = async () => {
+    let isError = validate();
+    if (isError) return;
+    if (!contextUser?.user) return;
+
+    try {
+      if (!file) return alert("You have no file");
+      if (!cropper) return alert("You have no file");
+      setIsUpdating(true);
+
+      const newImageId = await useChangeUserImage(file, cropper, userImage);
+      await useUpdateProfileImage(currentProfile?.id || "", newImageId);
+
+      await contextUser.checkUser();
+      setCurrentProfile(contextUser?.user?.id);
+      setIsEditProfileOpen(false);
+      setIsUpdating(false);
+    } catch (error) {
+      console.log(error);
+      setIsUpdating(false);
+      alert(error);
+    }
+  };
+
   const showError = (type: string) => {
     if (error && Object.entries(error).length > 0 && error?.type == type) {
       return error.message;
     }
     return "";
+  };
+
+  const validate = () => {
+    setError(null);
+    let isError = false;
+
+    if (!userName) {
+      setError({ type: "userName", message: "A Username is required" });
+      isError = true;
+    }
+    return isError;
   };
 
   return (
@@ -56,9 +115,9 @@ export default function EditProfileOverlay() {
       >
         <div
           className={`
-            relative bg-white w-full max-w-[700px] sm:h-[580px] h-[655px] mx-3 p-4 rounded-lg mb-10
-            ${!uploadedImage ? "h-[655px]" : "h-[580px]"}
-          `}
+                        relative bg-white w-full max-w-[700px] sm:h-[580px] h-[655px] mx-3 p-4 rounded-lg mb-10
+                        ${!uploadedImage ? "h-[655px]" : "h-[580px]"}
+                    `}
         >
           <div className="absolute flex items-center justify-between w-full p-5 left-0 top-0 border-b border-b-gray-300">
             <h1 className="text-[22px] font-medium">Edit profile</h1>
@@ -88,12 +147,10 @@ export default function EditProfileOverlay() {
 
                   <div className="flex items-center justify-center sm:-mt-6">
                     <label htmlFor="image" className="relative cursor-pointer">
-                      <Image
-                        alt="Profile photo"
+                      <img
                         className="rounded-full"
-                        width={95}
-                        height={95}
-                        src={userImage}
+                        width="95"
+                        src={useCreateBucketUrl(userImage)}
                       />
 
                       <button className="absolute bottom-0 right-0 rounded-full bg-white shadow-xl border p-1 border-gray-300 inline-block w-[32px] h-[32px]">
@@ -110,7 +167,6 @@ export default function EditProfileOverlay() {
                   </div>
                 </div>
 
-                {/* User Name Section */}
                 <div
                   id="UserNameSection"
                   className="flex flex-col border-b sm:h-[118px]  px-1.5 py-2 mt-1.5  w-full"
@@ -118,6 +174,7 @@ export default function EditProfileOverlay() {
                   <h3 className="font-semibold text-[15px] sm:mb-0 mb-1 text-gray-700 sm:w-[160px] sm:text-left text-center">
                     Name
                   </h3>
+
                   <div className="flex items-center justify-center sm:-mt-6">
                     <div className="sm:w-[60%] w-full max-w-md">
                       <TextInput
@@ -141,7 +198,6 @@ export default function EditProfileOverlay() {
                   </div>
                 </div>
 
-                {/* User Bio Section */}
                 <div
                   id="UserBioSection"
                   className="flex flex-col sm:h-[120px]  px-1.5 py-2 mt-2 w-full"
@@ -157,21 +213,20 @@ export default function EditProfileOverlay() {
                         rows={4}
                         onChange={(e) => setUserBio(e.target.value)}
                         value={userBio || ""}
-                        placeholder="description"
                         maxLength={80}
                         className="
-                            resize-none
-                            w-full
-                            bg-[#F1F1F2]
-                            text-gray-800
-                            border
-                            border-gray-300
-                            rounded-md
-                            py-2.5
-                            px-3
-                            focus:outline-none
-                        "
-                      />
+                                                    resize-none
+                                                    w-full
+                                                    bg-[#F1F1F2]
+                                                    text-gray-800
+                                                    border
+                                                    border-gray-300
+                                                    rounded-md
+                                                    py-2.5
+                                                    px-3
+                                                    focus:outline-none
+                                                "
+                      ></textarea>
                       <p className="text-[11px] text-gray-500">
                         {userBio ? userBio.length : 0}/80
                       </p>
@@ -211,7 +266,7 @@ export default function EditProfileOverlay() {
                 <button
                   disabled={isUpdating}
                   onClick={() => updateUserInfo()}
-                  className="flex items-center bg-[#EC8523] text-white border rounded-md ml-3 px-3 py-[6px]"
+                  className="flex items-center bg-[#F02C56] text-white border rounded-md ml-3 px-3 py-[6px]"
                 >
                   <span className="mx-4 font-medium text-[15px]">
                     {isUpdating ? (
@@ -239,7 +294,7 @@ export default function EditProfileOverlay() {
 
                 <button
                   onClick={() => cropAndUpdateImage()}
-                  className="flex items-center bg-[#EC8523] text-white border rounded-md ml-3 px-3 py-[6px]"
+                  className="flex items-center bg-[#F02C56] text-white border rounded-md ml-3 px-3 py-[6px]"
                 >
                   <span className="mx-4 font-medium text-[15px]">
                     {isUpdating ? (

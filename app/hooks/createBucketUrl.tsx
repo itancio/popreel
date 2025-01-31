@@ -1,7 +1,7 @@
 
 
 // This is an endpoint for the AppWrite bucket
-const useCreateBucketUrl = (fileId: string) => {
+const createBucketUrl = (fileId: string) => {
 
     const url = process.env.NEXT_PUBLIC_APPWRITE_URL
     const id = process.env.NEXT_PUBLIC_BUCKET_ID
@@ -12,4 +12,4 @@ const useCreateBucketUrl = (fileId: string) => {
     return `${url}/storage/buckets/${id}/files/${fileId}/view?project=${endpoint}`
 }
 
-export default useCreateBucketUrl
+export default createBucketUrl

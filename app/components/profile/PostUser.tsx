@@ -1,13 +1,13 @@
-import { PostUserCompTypes } from "@/app/types";
-import Link from "next/link";
-import { useEffect } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { BiErrorCircle } from "react-icons/bi";
 import { SiSoundcharts } from "react-icons/si";
+import { BiErrorCircle } from "react-icons/bi";
+import { useEffect } from "react";
+import Link from "next/link";
+import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
+import { PostUserCompTypes } from "@/app/types";
 
 export default function PostUser({ post }: PostUserCompTypes) {
   useEffect(() => {
-    // Event listener for Video playback
     const video = document.getElementById(
       `video${post?.id}`
     ) as HTMLVideoElement;
@@ -40,12 +40,10 @@ export default function PostUser({ post }: PostUserCompTypes) {
               muted
               loop
               className="aspect-[3/4] object-cover rounded-md"
-              src={post.video_url}
+              src={useCreateBucketUrl(post.video_url)}
             />
           </Link>
         )}
-
-        {/* Caption Section */}
         <div className="px-1">
           <p className="text-gray-700 text-[15px] pt-1 break-words">
             {post.text}

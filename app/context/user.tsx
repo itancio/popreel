@@ -10,8 +10,8 @@ import React, {
 import { account, ID } from "@/libs/AppWriteClient";
 import { User, UserContextTypes } from "../types";
 import { useRouter } from "next/navigation";
-import useGetProfileByUserId from "../hooks/useGetProfileByUserId";
-import useCreateProfile from "../hooks/useCreateProfile";
+import useGetProfileByUserId from "../hooks/getProfileByUserId";
+import useCreateProfile from "../hooks/createProfile";
 
 const UserContext = createContext<UserContextTypes | null>(null);
 

@@ -1,6 +1,6 @@
 import { database } from "@/libs/AppWriteClient"
 
-const useUpdateProfile = async (id: string, name: string, bio: string) => {
+const updateProfile = async (id: string, name: string, bio: string) => {
     try {
         await database.updateDocument(
             String(process.env.NEXT_PUBLIC_DATABASE_ID), 
@@ -15,4 +15,4 @@ const useUpdateProfile = async (id: string, name: string, bio: string) => {
     }
 }
 
-export default useUpdateProfile
+export default updateProfile

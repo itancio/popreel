@@ -1,32 +1,37 @@
-import { CommentsCompTypes } from "@/app/types";
-import ClientOnly from "@/app/components/ClientOnly";
-import SingleComment from "@/app/components/post/SingleComment";
-import { BiLoaderCircle } from "react-icons/bi";
 import { useState } from "react";
-
-const commentsByPost = [
-  {
-    id: "123",
-    user_id: "456",
-    post_id: "987",
-    text: "this is some text",
-    created_at: "2022-01-01T00:00:00Z",
-    profile: {
-      user_id: "456",
-      name: "User 1",
-      image: "https://placehold.co/100",
-    },
-  },
-];
+import SingleComment from "./SingleComment";
+import { useUser } from "@/app/context/user";
+import { BiLoaderCircle } from "react-icons/bi";
+import ClientOnly from "../ClientOnly";
+import { useCommentStore } from "@/app/stores/comment";
+import createComment from "@/app/hooks/createComment";
+import { useGeneralStore } from "@/app/stores/general";
+import { CommentsCompTypes } from "@/app/types";
 
 export default function Comments({ params }: CommentsCompTypes) {
-  const [inputFocused, setInputFocused] = useState<boolean>(false);
+  const { commentsByPost, setCommentsByPost } = useCommentStore();
+  const { setIsLoginOpen } = useGeneralStore();
+
+  const contextUser = useUser();
   const [comment, setComment] = useState<string>("");
+  const [inputFocused, setInputFocused] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const addComment = async () => {
-    console.log(await "Adding comment");
+    if (!contextUser?.user) return setIsLoginOpen(true);
+
+    try {
+      setIsUploading(true);
+      await createComment(contextUser?.user?.id, params?.postId, comment);
+      setCommentsByPost(params?.postId);
+      setComment("");
+      setIsUploading(false);
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
   };
+
   return (
     <>
       <div
@@ -48,6 +53,7 @@ export default function Comments({ params }: CommentsCompTypes) {
             </div>
           )}
         </ClientOnly>
+
         <div className="mb-28" />
       </div>
 
@@ -57,13 +63,13 @@ export default function Comments({ params }: CommentsCompTypes) {
       >
         <div
           className={`
-                bg-[#F1F1F2] flex items-center rounded-lg w-full lg:max-w-[420px]
-                ${
-                  inputFocused
-                    ? "border-2 border-gray-400"
-                    : "border-2 border-[#F1F1F2]"
-                }
-            `}
+                        bg-[#F1F1F2] flex items-center rounded-lg w-full lg:max-w-[420px]
+                        ${
+                          inputFocused
+                            ? "border-2 border-gray-400"
+                            : "border-2 border-[#F1F1F2]"
+                        }
+                    `}
         >
           <input
             onFocus={() => setInputFocused(true)}
@@ -75,7 +81,6 @@ export default function Comments({ params }: CommentsCompTypes) {
             placeholder="Add comment..."
           />
         </div>
-
         {!isUploading ? (
           <button
             disabled={!comment}

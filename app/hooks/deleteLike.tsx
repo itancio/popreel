@@ -1,10 +1,10 @@
 import { database } from "@/libs/AppWriteClient"
 
-const useDeleteComment = async (id: string) => {
+const deleteLike = async (id: string) => {
     try {
         await database.deleteDocument(
             String(process.env.NEXT_PUBLIC_DATABASE_ID), 
-            String(process.env.NEXT_PUBLIC_COLLECTION_ID_COMMENT), 
+            String(process.env.NEXT_PUBLIC_COLLECTION_ID_LIKE), 
             id
         );
     } catch (error) {
@@ -12,4 +12,4 @@ const useDeleteComment = async (id: string) => {
     }
 }
 
-export default useDeleteComment
+export default deleteLike

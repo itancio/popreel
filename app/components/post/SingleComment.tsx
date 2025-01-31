@@ -1,21 +1,35 @@
+import { useUser } from "@/app/context/user";
 import Link from "next/link";
-import Image from "next/image";
-import { SingleCommentCompTypes } from "@/app/types";
 import { useState } from "react";
 import { BiLoaderCircle } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
+import { useCommentStore } from "@/app/stores/comment";
+import moment from "moment";
+import useDeleteComment from "@/app/hooks/deleteComment";
+import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
+import { SingleCommentCompTypes } from "@/app/types";
 
 export default function SingleComment({
   comment,
   params,
 }: SingleCommentCompTypes) {
+  const contextUser = useUser();
+  let { setCommentsByPost } = useCommentStore();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteThisComment = async () => {
-    const res = confirm("Are you sure you weant to delete this comment?");
+    let res = confirm("Are you sure you weant to delete this comment?");
     if (!res) return;
 
-    // do something
+    try {
+      setIsDeleting(true);
+      await useDeleteComment(comment?.id);
+      setCommentsByPost(params?.postId);
+      setIsDeleting(false);
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
   };
   return (
     <>
@@ -25,12 +39,10 @@ export default function SingleComment({
       >
         <div className="flex items-center relative w-full">
           <Link href={`/profile/${comment.profile.user_id}`}>
-            <Image
-              alt="profile"
+            <img
               className="absolute top-0 rounded-full lg:mx-0 mx-auto"
-              width={40}
-              height={40}
-              src="https://placehold.co/100"
+              width="40"
+              src={useCreateBucketUrl(comment.profile.image)}
             />
           </Link>
           <div className="ml-14 pt-0.5 w-full">
@@ -38,11 +50,11 @@ export default function SingleComment({
               <span className="flex items-center">
                 {comment?.profile?.name} -
                 <span className="text-[12px] text-gray-600 font-light ml-1">
-                  {comment?.created_at}
+                  {moment(comment?.created_at).calendar()}
                 </span>
               </span>
 
-              {true ? (
+              {contextUser?.user?.id == comment.profile.user_id ? (
                 <button
                   disabled={isDeleting}
                   onClick={() => deleteThisComment()}

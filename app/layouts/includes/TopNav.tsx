@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import debounce from "debounce";
 import { useRouter, usePathname } from "next/navigation";
 import { BiSearch, BiUser } from "react-icons/bi";
@@ -8,9 +9,9 @@ import { FiLogOut } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/context/user";
 import { useGeneralStore } from "@/app/stores/general";
-import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
+import createBucketUrl from "@/app/hooks/createBucketUrl";
 import { RandomUsers } from "@/app/types";
-import useSearchProfilesByName from "@/app/hooks/useSearchProfilesByName";
+import searchProfilesByName from "@/app/hooks/searchProfilesByName";
 
 export default function TopNav() {
   const userContext = useUser();
@@ -18,19 +19,19 @@ export default function TopNav() {
   const pathname = usePathname();
 
   const [searchProfiles, setSearchProfiles] = useState<RandomUsers[]>([]);
-  let [showMenu, setShowMenu] = useState<boolean>(false);
-  let { setIsLoginOpen, setIsEditProfileOpen } = useGeneralStore();
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const { setIsLoginOpen, setIsEditProfileOpen } = useGeneralStore();
 
   useEffect(() => {
     setIsEditProfileOpen(false);
-  }, []);
+  }, [setIsEditProfileOpen]);
 
   const handleSearchName = debounce(
     async (event: { target: { value: string } }) => {
       if (event.target.value == "") return setSearchProfiles([]);
 
       try {
-        const result = await useSearchProfilesByName(event.target.value);
+        const result = await searchProfilesByName(event.target.value);
         if (result) return setSearchProfiles(result);
         setSearchProfiles([]);
       } catch (error) {
@@ -59,9 +60,12 @@ export default function TopNav() {
           }`}
         >
           <Link href="/">
-            <img
+            <Image
+              alt="tiktok logo"
               className="min-w-[115px] w-[115px]"
               src="/images/tiktok-logo.png"
+              width={115}
+              height={115}
             />
           </Link>
 
@@ -82,10 +86,12 @@ export default function TopNav() {
                       className="flex items-center justify-between w-full cursor-pointer hover:bg-[#F12B56] p-1 px-2 hover:text-white"
                     >
                       <div className="flex items-center">
-                        <img
+                        <Image
+                          alt="profile image"
                           className="rounded-md"
-                          width="40"
-                          src={useCreateBucketUrl(profile?.image)}
+                          width={40}
+                          height={40}
+                          src={createBucketUrl(profile?.image)}
                         />
                         <div className="truncate ml-2">{profile?.name}</div>
                       </div>
@@ -125,12 +131,13 @@ export default function TopNav() {
               <div className="flex items-center">
                 <div className="relative">
                   <button
-                    onClick={() => setShowMenu((showMenu = !showMenu))}
+                    onClick={() => setShowMenu(!showMenu)}
                     className="mt-1 border border-gray-200 rounded-full"
                   >
-                    <img
+                    <Image
+                      alt="profile image"
                       className="rounded-full w-[35px] h-[35px]"
-                      src={useCreateBucketUrl(userContext?.user?.image || "")}
+                      src={createBucketUrl(userContext?.user?.image || "")}
                     />
                   </button>
 

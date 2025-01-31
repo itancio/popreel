@@ -1,17 +1,17 @@
 import { database, Query } from "@/libs/AppWriteClient"
 
-const useSearchProfilesByName = async (name: string) => {
+const getRandomUsers = async () => {
     try {
         const profileResult = await database.listDocuments(
             String(process.env.NEXT_PUBLIC_DATABASE_ID), 
             String(process.env.NEXT_PUBLIC_COLLECTION_ID_PROFILE), 
             [ 
-                Query.limit(5),
-                Query.search("name", name)
+                Query.limit(5) 
             ]
         );
+        const documents = profileResult.documents
 
-       const objPromises = profileResult.documents.map(profile => {
+       const objPromises = documents.map(profile => {
             return {
                 id: profile?.user_id,  
                 name: profile?.name,
@@ -26,4 +26,4 @@ const useSearchProfilesByName = async (name: string) => {
     }
 }
 
-export default useSearchProfilesByName
+export default getRandomUsers

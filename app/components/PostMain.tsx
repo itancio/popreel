@@ -1,14 +1,14 @@
 "use client";
-import { useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { PostMainCompTypes } from "../types";
+
 import { AiFillHeart } from "react-icons/ai";
 import { ImMusic } from "react-icons/im";
+import Link from "next/link";
+import { useEffect } from "react";
 import PostMainLikes from "./PostMainLikes";
+import useCreateBucketUrl from "../hooks/createBucketUrl";
+import { PostMainCompTypes } from "../types";
 
 export default function PostMain({ post }: PostMainCompTypes) {
-  // useEffect to track video playback
   useEffect(() => {
     const video = document.getElementById(
       `video-${post?.id}`
@@ -16,10 +16,9 @@ export default function PostMain({ post }: PostMainCompTypes) {
     const postMainElement = document.getElementById(`PostMain-${post.id}`);
 
     if (postMainElement) {
-      const observer = new IntersectionObserver(
+      let observer = new IntersectionObserver(
         (entries) => {
-          const entry = entries[0];
-          entry.isIntersecting ? video.play() : video.pause();
+          entries[0].isIntersecting ? video.play() : video.pause();
         },
         { threshold: [0.6] }
       );
@@ -31,14 +30,11 @@ export default function PostMain({ post }: PostMainCompTypes) {
   return (
     <>
       <div id={`PostMain-${post.id}`} className="flex border-b py-6">
-        {/* Profile Info Section */}
         <div className="cursor-pointer">
-          <Image
+          <img
             className="rounded-full max-h-[60px]"
-            alt="profile image"
-            width={60}
-            height={60}
-            src="https://placehold.co/100"
+            width="60"
+            src={useCreateBucketUrl(post?.profile?.image)}
           />
         </div>
 
@@ -50,7 +46,7 @@ export default function PostMain({ post }: PostMainCompTypes) {
               </span>
             </Link>
 
-            <button className="border text-[15px] px-[21px] py-0.5 border-[#EC8523] text-[#EC8523] hover:bg-[#ffeef2] font-semibold rounded-md">
+            <button className="border text-[15px] px-[21px] py-0.5 border-[#F02C56] text-[#F02C56] hover:bg-[#ffeef2] font-semibold rounded-md">
               Follow
             </button>
           </div>
@@ -74,14 +70,12 @@ export default function PostMain({ post }: PostMainCompTypes) {
                 controls
                 muted
                 className="rounded-xl object-cover mx-auto h-full"
-                src={post?.video_url}
+                src={useCreateBucketUrl(post?.video_url)}
               />
-              <Image
-                alt="popreel logo"
-                className="absolute right-2 bottom-16"
-                width={140}
-                height={140}
-                src="/images/popreel-logo.gif"
+              <img
+                className="absolute right-2 bottom-10"
+                width="90"
+                src="/images/tiktok-logo-white.png"
               />
             </div>
 
