@@ -65,7 +65,7 @@ export default function Post({ params }: PostPageTypes) {
             className="absolute z-20 top-[18px] left-[70px] rounded-full lg:mx-0 mx-auto"
             width={45}
             height={45}
-            src="/images/popreel.gif"
+            src="/images/tiktok.png"
           />
 
           <ClientOnly>

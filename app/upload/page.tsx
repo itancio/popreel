@@ -172,8 +172,8 @@ export default function Upload() {
 
                 <Image
                   alt="mobile image"
-                  width={150}
-                  height={150}
+                  width={280}
+                  height={280}
                   className="absolute z-20 pointer-events-none"
                   src="/images/mobile-case.png"
                 />

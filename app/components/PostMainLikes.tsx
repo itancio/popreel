@@ -6,67 +6,48 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { useGeneralStore } from "../stores/general";
 import { useRouter } from "next/navigation";
 import { Comment, Like, PostMainLikesCompTypes } from "../types";
-import useGetCommentsByPostId from "../hooks/getCommentsByPostId";
-import useGetLikesByPostId from "../hooks/getLikesByPostId";
-import useIsLiked from "../hooks/isLiked";
-import useCreateLike from "../hooks/createLike";
-import useDeleteLike from "../hooks/deleteLike";
+import getCommentsByPostId from "../hooks/getCommentsByPostId";
+import getLikesByPostId from "../hooks/getLikesByPostId";
+import createLike from "../hooks/createLike";
+import deleteLike from "../hooks/deleteLike";
 
 export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
-  let { setIsLoginOpen } = useGeneralStore();
-
+  const { setIsLoginOpen } = useGeneralStore();
   const router = useRouter();
   const contextUser = useUser();
-  const [hasClickedLike, setHasClickedLike] = useState<boolean>(false);
-  const [userLiked, setUserLiked] = useState<boolean>(false);
+
+  const [hasClickedLike, setHasClickedLike] = useState(false);
+  const [userLiked, setUserLiked] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [likes, setLikes] = useState<Like[]>([]);
 
   useEffect(() => {
-    getAllLikesByPost();
-    getAllCommentsByPost();
-  }, [post]);
+    if (!post?.id) return;
+
+    const fetchData = async () => {
+      const [likesResult, commentsResult] = await Promise.all([
+        getLikesByPostId(post.id),
+        getCommentsByPostId(post.id),
+      ]);
+      setLikes(likesResult);
+      setComments(commentsResult);
+    };
+
+    fetchData();
+  }, [post?.id]);
 
   useEffect(() => {
-    hasUserLikedPost();
-  }, [likes, contextUser]);
-
-  const getAllCommentsByPost = async () => {
-    let result = await useGetCommentsByPostId(post?.id);
-    setComments(result);
-  };
-
-  const getAllLikesByPost = async () => {
-    let result = await useGetLikesByPostId(post?.id);
-    setLikes(result);
-  };
-
-  const hasUserLikedPost = () => {
-    if (!contextUser) return;
-
-    if (likes?.length < 1 || !contextUser?.user?.id) {
+    if (!contextUser?.user?.id) {
       setUserLiked(false);
       return;
     }
-    let res = useIsLiked(contextUser?.user?.id, post?.id, likes);
-    setUserLiked(res ? true : false);
-  };
+    setUserLiked(likes.some((like) => like.user_id === contextUser.user.id));
+  }, [likes, contextUser]);
 
-  const like = async () => {
-    setHasClickedLike(true);
-    await useCreateLike(contextUser?.user?.id || "", post?.id);
-    await getAllLikesByPost();
-    hasUserLikedPost();
-    setHasClickedLike(false);
-  };
-
-  const unlike = async (id: string) => {
-    setHasClickedLike(true);
-    await useDeleteLike(id);
-    await getAllLikesByPost();
-    hasUserLikedPost();
-    setHasClickedLike(false);
-  };
+  const isUserLiked = likes.some(
+    (like) => like.user_id === contextUser?.user?.id
+  );
+  const likeButtonColor = isUserLiked ? "#ff2626" : "";
 
   const likeOrUnlike = () => {
     if (!contextUser?.user?.id) {
@@ -74,68 +55,61 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
       return;
     }
 
-    let res = useIsLiked(contextUser?.user?.id, post?.id, likes);
-
-    if (!res) {
-      like();
+    if (!isUserLiked) {
+      createLike(post.id, contextUser.user.id);
     } else {
-      likes.forEach((like: Like) => {
-        if (
-          contextUser?.user?.id == like?.user_id &&
-          like?.post_id == post?.id
-        ) {
-          unlike(like?.id);
-        }
-      });
+      const userLike = likes.find(
+        (like) =>
+          like.user_id === contextUser.user.id && like.post_id === post.id
+      );
+      if (userLike) deleteLike(userLike.id);
     }
   };
 
   return (
-    <>
-      <div id={`PostMainLikes-${post?.id}`} className="relative mr-[75px]">
-        <div className="absolute bottom-0 pl-2">
-          <div className="pb-4 text-center">
-            <button
-              disabled={hasClickedLike}
-              onClick={() => likeOrUnlike()}
-              className="rounded-full bg-gray-200 p-2 cursor-pointer"
-            >
-              {!hasClickedLike ? (
-                <AiFillHeart
-                  color={likes?.length > 0 && userLiked ? "#ff2626" : ""}
-                  size="25"
-                />
-              ) : (
-                <BiLoaderCircle className="animate-spin" size="25" />
-              )}
-            </button>
-            <span className="text-xs text-gray-800 font-semibold">
-              {likes?.length}
-            </span>
-          </div>
-
+    <div id={`PostMainLikes-${post?.id}`} className="relative mr-[75px]">
+      <div className="absolute bottom-0 pl-2">
+        {/* Like Button */}
+        <div className="pb-4 text-center">
           <button
-            onClick={() =>
-              router.push(`/post/${post?.id}/${post?.profile?.user_id}`)
-            }
-            className="pb-4 text-center"
+            disabled={hasClickedLike}
+            onClick={likeOrUnlike}
+            className="rounded-full bg-gray-200 p-2 cursor-pointer"
           >
-            <div className="rounded-full bg-gray-200 p-2 cursor-pointer">
-              <FaCommentDots size="25" />
-            </div>
-            <span className="text-xs text-gray-800 font-semibold">
-              {comments?.length}
-            </span>
+            {!hasClickedLike ? (
+              <AiFillHeart color={likeButtonColor} size="25" />
+            ) : (
+              <BiLoaderCircle className="animate-spin" size="25" />
+            )}
           </button>
-
-          <button className="text-center">
-            <div className="rounded-full bg-gray-200 p-2 cursor-pointer">
-              <FaShare size="25" />
-            </div>
-            <span className="text-xs text-gray-800 font-semibold">55</span>
-          </button>
+          <span className="text-xs text-gray-800 font-semibold">
+            {likes.length}
+          </span>
         </div>
+
+        {/* Comment Button */}
+        <button
+          onClick={() =>
+            router.push(`/post/${post?.id}/${post?.profile?.user_id}`)
+          }
+          className="pb-4 text-center"
+        >
+          <div className="rounded-full bg-gray-200 p-2 cursor-pointer">
+            <FaCommentDots size="25" />
+          </div>
+          <span className="text-xs text-gray-800 font-semibold">
+            {comments.length}
+          </span>
+        </button>
+
+        {/* Share Button */}
+        <button className="text-center">
+          <div className="rounded-full bg-gray-200 p-2 cursor-pointer">
+            <FaShare size="25" />
+          </div>
+          <span className="text-xs text-gray-800 font-semibold">55</span>
+        </button>
       </div>
-    </>
+    </div>
   );
 }

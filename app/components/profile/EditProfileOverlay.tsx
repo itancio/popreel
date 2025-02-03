@@ -10,14 +10,15 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { CropperDimensions, ShowErrorObject } from "@/app/types";
 import { useProfileStore } from "@/app/stores/profile";
 import { useGeneralStore } from "@/app/stores/general";
-import useUpdateProfile from "@/app/hooks/updateProfile";
-import useChangeUserImage from "@/app/hooks/changeUserImage";
-import useUpdateProfileImage from "@/app/hooks/updateProfileImage";
-import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
+import updateProfile from "@/app/hooks/updateProfile";
+import changeUserImage from "@/app/hooks/changeUserImage";
+import updateProfileImage from "@/app/hooks/updateProfileImage";
+import Image from "next/image";
+import createBucketUrl from "@/app/hooks/createBucketUrl";
 
 export default function EditProfileOverlay() {
-  let { currentProfile, setCurrentProfile } = useProfileStore();
-  let { setIsEditProfileOpen } = useGeneralStore();
+  const { currentProfile, setCurrentProfile } = useProfileStore();
+  const { setIsEditProfileOpen } = useGeneralStore();
 
   const contextUser = useUser();
   const router = useRouter();
@@ -50,13 +51,13 @@ export default function EditProfileOverlay() {
   };
 
   const updateUserInfo = async () => {
-    let isError = validate();
+    const isError = validate();
     if (isError) return;
     if (!contextUser?.user) return;
 
     try {
       setIsUpdating(true);
-      await useUpdateProfile(currentProfile?.id || "", userName, userBio);
+      await updateProfile(currentProfile?.id || "", userName, userBio);
       setCurrentProfile(contextUser?.user?.id);
       setIsEditProfileOpen(false);
       router.refresh();
@@ -66,7 +67,7 @@ export default function EditProfileOverlay() {
   };
 
   const cropAndUpdateImage = async () => {
-    let isError = validate();
+    const isError = validate();
     if (isError) return;
     if (!contextUser?.user) return;
 
@@ -75,8 +76,8 @@ export default function EditProfileOverlay() {
       if (!cropper) return alert("You have no file");
       setIsUpdating(true);
 
-      const newImageId = await useChangeUserImage(file, cropper, userImage);
-      await useUpdateProfileImage(currentProfile?.id || "", newImageId);
+      const newImageId = await changeUserImage(file, cropper, userImage);
+      await updateProfileImage(currentProfile?.id || "", newImageId);
 
       await contextUser.checkUser();
       setCurrentProfile(contextUser?.user?.id);
@@ -147,10 +148,12 @@ export default function EditProfileOverlay() {
 
                   <div className="flex items-center justify-center sm:-mt-6">
                     <label htmlFor="image" className="relative cursor-pointer">
-                      <img
+                      <Image
+                        alt="profile image"
+                        width={95}
+                        height={95}
                         className="rounded-full"
-                        width="95"
-                        src={useCreateBucketUrl(userImage)}
+                        src={createBucketUrl(userImage)}
                       />
 
                       <button className="absolute bottom-0 right-0 rounded-full bg-white shadow-xl border p-1 border-gray-300 inline-block w-[32px] h-[32px]">
@@ -215,17 +218,17 @@ export default function EditProfileOverlay() {
                         value={userBio || ""}
                         maxLength={80}
                         className="
-                                                    resize-none
-                                                    w-full
-                                                    bg-[#F1F1F2]
-                                                    text-gray-800
-                                                    border
-                                                    border-gray-300
-                                                    rounded-md
-                                                    py-2.5
-                                                    px-3
-                                                    focus:outline-none
-                                                "
+                          resize-none
+                          w-full
+                          bg-[#F1F1F2]
+                          text-gray-800
+                          border
+                          border-gray-300
+                          rounded-md
+                          py-2.5
+                          px-3
+                          focus:outline-none
+                      "
                       ></textarea>
                       <p className="text-[11px] text-gray-500">
                         {userBio ? userBio.length : 0}/80

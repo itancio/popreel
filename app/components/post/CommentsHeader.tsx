@@ -34,23 +34,42 @@ export default function CommentsHeader({
   const [hasClickedLike, setHasClickedLike] = useState<boolean>(false);
   const [isDeleteing, setIsDeleteing] = useState<boolean>(false);
   const [userLiked, setUserLiked] = useState<boolean>(false);
+  const [postId, setPostId] = useState<string | null>(null);
 
   useEffect(() => {
-    setCommentsByPost(params?.postId);
-    setLikesByPost(params?.postId);
-  }, [post]);
-  useEffect(() => {
-    hasUserLikedPost();
-  }, [likesByPost]);
-
-  const hasUserLikedPost = () => {
-    if (likesByPost.length < 1 || !contextUser?.user?.id) {
-      setUserLiked(false);
-      return;
+    async function resolveParams() {
+      try {
+        const resolvedParams = await params;
+        if (resolvedParams?.postId) {
+          setPostId(resolvedParams.postId);
+        } else {
+          console.warn("Post ID is missing or invalid");
+        }
+      } catch (error) {
+        console.error("Error resolving params:", error);
+      }
     }
-    const res = isLiked(contextUser.user.id, params.postId, likesByPost);
-    setUserLiked(res ? true : false);
-  };
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (postId) {
+      setCommentsByPost(postId);
+      setLikesByPost(postId);
+    }
+  }, [postId, setCommentsByPost, setLikesByPost]);
+
+  useEffect(() => {
+    const hasUserLikedPost = () => {
+      if (likesByPost.length < 1 || !contextUser?.user?.id) {
+        setUserLiked(false);
+        return;
+      }
+      const res = isLiked(contextUser.user.id, params.postId, likesByPost);
+      setUserLiked(res ? true : false);
+    };
+    hasUserLikedPost();
+  }, [likesByPost, postId, contextUser?.user?.id, params.postId]);
 
   const like = async () => {
     try {

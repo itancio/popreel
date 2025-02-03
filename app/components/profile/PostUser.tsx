@@ -3,7 +3,7 @@ import { SiSoundcharts } from "react-icons/si";
 import { BiErrorCircle } from "react-icons/bi";
 import { useEffect } from "react";
 import Link from "next/link";
-import useCreateBucketUrl from "@/app/hooks/createBucketUrl";
+import createBucketUrl from "@/app/hooks/createBucketUrl";
 import { PostUserCompTypes } from "@/app/types";
 
 export default function PostUser({ post }: PostUserCompTypes) {
@@ -40,7 +40,7 @@ export default function PostUser({ post }: PostUserCompTypes) {
               muted
               loop
               className="aspect-[3/4] object-cover rounded-md"
-              src={useCreateBucketUrl(post.video_url)}
+              src={createBucketUrl(post.video_url)}
             />
           </Link>
         )}

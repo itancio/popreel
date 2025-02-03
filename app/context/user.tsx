@@ -21,8 +21,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const checkUser = async () => {
     try {
+      console.log("Checking user session...");
       const currentSession = await account.getSession("current");
-      if (!currentSession) return;
+      console.log("Current session:", currentSession);
+
+      if (!currentSession) {
+        console.log("No active session found.");
+        return;
+      }
 
       const promise = await account.get();
       const profile = await getProfileByUserId(promise?.$id);
@@ -40,7 +46,16 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    checkUser();
+    const init = async () => {
+      try {
+        await account.get();
+        checkUser();
+      } catch (error) {
+        console.log("No active session or authentication required.", error);
+        setUser(null);
+      }
+    };
+    init();
   }, []);
 
   const register = async (name: string, email: string, password: string) => {
@@ -51,7 +66,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       await createProfile(
         promise?.$id,
         name,
-        String(process.env.NEXT_PUBLIC_PLACEHOLDER_DEAFULT_IMAGE_ID),
+        String(process.env.NEXT_PUBLIC_PLACEHOLDER_DEAFAULT_IMAGE_ID),
         ""
       );
       await checkUser();

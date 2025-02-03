@@ -3,38 +3,49 @@
 import { AiFillHeart } from "react-icons/ai";
 import { ImMusic } from "react-icons/im";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import PostMainLikes from "./PostMainLikes";
 import useCreateBucketUrl from "../hooks/createBucketUrl";
 import { PostMainCompTypes } from "../types";
+import Image from "next/image";
 
 export default function PostMain({ post }: PostMainCompTypes) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
-    const video = document.getElementById(
-      `video-${post?.id}`
-    ) as HTMLVideoElement;
+    if (!post?.id || !videoRef.current) return;
+
     const postMainElement = document.getElementById(`PostMain-${post.id}`);
 
     if (postMainElement) {
-      let observer = new IntersectionObserver(
-        (entries) => {
-          entries[0].isIntersecting ? video.play() : video.pause();
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            videoRef.current?.play();
+          } else {
+            videoRef.current?.pause();
+          }
         },
-        { threshold: [0.6] }
+        { threshold: 0.6 }
       );
 
       observer.observe(postMainElement);
+
+      return () => observer.disconnect(); // Cleanup observer
     }
-  }, []);
+  }, [post?.id]);
 
   return (
     <>
       <div id={`PostMain-${post.id}`} className="flex border-b py-6">
         <div className="cursor-pointer">
-          <img
+          <Image
+            alt="profile image"
             className="rounded-full max-h-[60px]"
-            width="60"
+            width={60}
+            height={60}
             src={useCreateBucketUrl(post?.profile?.image)}
+            loading="lazy"
           />
         </div>
 
@@ -72,10 +83,13 @@ export default function PostMain({ post }: PostMainCompTypes) {
                 className="rounded-xl object-cover mx-auto h-full"
                 src={useCreateBucketUrl(post?.video_url)}
               />
-              <img
+              <Image
+                alt="logo"
                 className="absolute right-2 bottom-10"
-                width="90"
+                width={90}
+                height={90}
                 src="/images/tiktok-logo-white.png"
+                loading="lazy"
               />
             </div>
 
