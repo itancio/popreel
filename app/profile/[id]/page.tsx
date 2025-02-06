@@ -13,9 +13,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { BsPencil } from "react-icons/bs";
 
-export default function Profile({ params }: ProfilePageTypes) {
+export default function Profile({ data }: ProfilePageTypes) {
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const contextUser = useUser();
   const { postsByUser, setPostsByUser } = usePostStore();
@@ -26,7 +25,7 @@ export default function Profile({ params }: ProfilePageTypes) {
   useEffect(() => {
     async function resolveParams() {
       try {
-        const resolvedParams = await params;
+        const resolvedParams = data;
         if (resolvedParams?.id) {
           setUserId(resolvedParams.id);
         } else {
@@ -34,12 +33,10 @@ export default function Profile({ params }: ProfilePageTypes) {
         }
       } catch (error) {
         console.error("Error resolving params:", error);
-      } finally {
-        setLoading(false);
       }
     }
     resolveParams();
-  }, [params]);
+  }, [data]);
 
   // Fetch user data when userId is available
   useEffect(() => {
@@ -49,8 +46,8 @@ export default function Profile({ params }: ProfilePageTypes) {
     }
   }, [userId, setCurrentProfile, setPostsByUser]);
 
-  if (loading) return <p className="text-center mt-10">Loading profile...</p>;
-  if (!userId) return <p className="text-center mt-10">Profile not found.</p>;
+  // if (loading) return <p className="text-center mt-10">Loading profile...</p>;
+  // if (!userId) return <p className="text-center mt-10">Profile not found.</p>;
 
   return (
     <>

@@ -84,10 +84,10 @@ export default function PostMain({ post }: PostMainCompTypes) {
               />
               <Image
                 alt="logo"
-                className="absolute right-2 bottom-10"
+                className="absolute right-2 bottom-14"
                 width={90}
                 height={90}
-                src="/images/tiktok-logo-white.png"
+                src="/images/tiktok-white.png"
               />
             </div>
 

@@ -16,7 +16,7 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
   const router = useRouter();
   const contextUser = useUser();
 
-  const [hasClickedLike, setHasClickedLike] = useState(false);
+  const [hasClickedLike] = useState(false);
   const [userLiked, setUserLiked] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [likes, setLikes] = useState<Like[]>([]);
@@ -41,13 +41,13 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
       setUserLiked(false);
       return;
     }
-    setUserLiked(likes.some((like) => like.user_id === contextUser.user.id));
+    setUserLiked(likes.some((like) => like.user_id === contextUser?.user?.id));
   }, [likes, contextUser]);
 
-  const isUserLiked = likes.some(
-    (like) => like.user_id === contextUser?.user?.id
-  );
-  const likeButtonColor = isUserLiked ? "#ff2626" : "";
+  // const isUserLiked = likes.some(
+  //   (like) => like.user_id === contextUser?.user?.id
+  // );
+  const likeButtonColor = userLiked ? "#ff2626" : "";
 
   const likeOrUnlike = () => {
     if (!contextUser?.user?.id) {
@@ -55,12 +55,12 @@ export default function PostMainLikes({ post }: PostMainLikesCompTypes) {
       return;
     }
 
-    if (!isUserLiked) {
+    if (!userLiked) {
       createLike(post.id, contextUser.user.id);
     } else {
       const userLike = likes.find(
         (like) =>
-          like.user_id === contextUser.user.id && like.post_id === post.id
+          like.user_id === contextUser?.user?.id && like.post_id === post.id
       );
       if (userLike) deleteLike(userLike.id);
     }

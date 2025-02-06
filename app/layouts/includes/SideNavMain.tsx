@@ -1,21 +1,20 @@
+import ClientOnly from "@/app/components/ClientOnly";
+import { useUser } from "@/app/context/user";
+import { useGeneralStore } from "@/app/stores/general";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MenuItem from "./MenuItem";
 import MenuItemFollow from "./MenuItemFollow";
-import { useEffect } from "react";
-import { useUser } from "@/app/context/user";
-import ClientOnly from "@/app/components/ClientOnly";
-import { useGeneralStore } from "@/app/stores/general";
 
 export default function SideNavMain() {
-  let { setRandomUsers, randomUsers } = useGeneralStore();
+  const { randomUsers } = useGeneralStore();
 
   const contextUser = useUser();
   const pathname = usePathname();
 
-  useEffect(() => {
-    setRandomUsers();
-  }, []);
+  //   useEffect(() => {
+  //     setRandomUsers();
+  //   }, []);
   return (
     <>
       <div
@@ -101,4 +100,3 @@ export default function SideNavMain() {
     </>
   );
 }
-

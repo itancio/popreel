@@ -34,7 +34,7 @@ export default function CommentsHeader({
   const [hasClickedLike, setHasClickedLike] = useState<boolean>(false);
   const [isDeleteing, setIsDeleteing] = useState<boolean>(false);
   const [userLiked, setUserLiked] = useState<boolean>(false);
-  const [postId, setPostId] = useState<string | null>(null);
+  const [postId, setPostId] = useState<string>("");
 
   useEffect(() => {
     async function resolveParams() {
@@ -65,16 +65,16 @@ export default function CommentsHeader({
         setUserLiked(false);
         return;
       }
-      const res = isLiked(contextUser.user.id, params.postId, likesByPost);
+      const res = isLiked(contextUser.user.id, postId, likesByPost);
       setUserLiked(res ? true : false);
     };
     hasUserLikedPost();
-  }, [likesByPost, postId, contextUser?.user?.id, params.postId]);
+  }, [likesByPost, postId, contextUser?.user?.id]);
 
   const like = async () => {
     try {
       setHasClickedLike(true);
-      await createLike(contextUser?.user?.id || "", params.postId);
+      await createLike(contextUser?.user?.id || "", postId);
       setLikesByPost(params.postId);
       setHasClickedLike(false);
     } catch (error) {
