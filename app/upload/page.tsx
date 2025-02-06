@@ -140,22 +140,22 @@ export default function Upload() {
             ) : (
               <div
                 className="
-                                    md:mx-0
-                                    mx-auto
-                                    mt-4
-                                    md:mb-12
-                                    mb-16
-                                    flex 
-                                    items-center 
-                                    justify-center 
-                                    w-full 
-                                    max-w-[260px] 
-                                    h-[540px] 
-                                    p-3 
-                                    rounded-2xl
-                                    cursor-pointer
-                                    relative
-                                "
+                  md:mx-0
+                  mx-auto
+                  mt-4
+                  md:mb-12
+                  mb-16
+                  flex 
+                  items-center 
+                  justify-center 
+                  w-full 
+                  max-w-[260px] 
+                  h-[540px] 
+                  p-3 
+                  rounded-2xl
+                  cursor-pointer
+                  relative
+              "
               >
                 {isUploading ? (
                   <div className="absolute flex items-center justify-center z-20 bg-black h-full w-full rounded-[50px] bg-opacity-50">
@@ -172,8 +172,8 @@ export default function Upload() {
 
                 <Image
                   alt="mobile image"
-                  width={280}
-                  height={280}
+                  width={260}
+                  height={100}
                   className="absolute z-20 pointer-events-none"
                   src="/images/mobile-case.png"
                 />
@@ -196,7 +196,7 @@ export default function Upload() {
                   <div className="flex items-center truncate">
                     <AiOutlineCheckCircle size="16" className="min-w-[16px]" />
                     <p className="text-[11px] pl-1 truncate text-ellipsis">
-                      {File.name}
+                      {file ? file.name : "video"}
                     </p>
                   </div>
                   <button

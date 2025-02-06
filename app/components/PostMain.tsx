@@ -45,7 +45,6 @@ export default function PostMain({ post }: PostMainCompTypes) {
             width={60}
             height={60}
             src={useCreateBucketUrl(post?.profile?.image)}
-            loading="lazy"
           />
         </div>
 
@@ -89,7 +88,6 @@ export default function PostMain({ post }: PostMainCompTypes) {
                 width={90}
                 height={90}
                 src="/images/tiktok-logo-white.png"
-                loading="lazy"
               />
             </div>
 
